@@ -6,10 +6,7 @@ import com.busra.couriertracking.repository.CourierRepository;
 import com.busra.couriertracking.repository.LocationRepository;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class LocationServiceImpl implements LocationService {
@@ -73,11 +70,6 @@ public class LocationServiceImpl implements LocationService {
         } catch (Exception e) {
             System.out.println("test");
         }
-    }
-
-    @Override
-    public List<Location> findAll() {
-        return locationRepository.findAll();
     }
 
 }

@@ -8,6 +8,7 @@ public interface LocationDao {
 
     void saveLocation(Location location);
 
+    //@Query({"headers.response.status": "?1"})
     List<Location> findByCourierId(String courierId);
 
 }
