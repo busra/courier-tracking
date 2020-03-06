@@ -1,5 +1,6 @@
 package com.busra.couriertracking.domain;
 
+import com.mongodb.client.model.geojson.Point;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -8,16 +9,36 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "location")
 public class Location {
 
-	@Id
-	private String id;
+    @Id
+    private String id;
 
-	private String name;
+    private Point location;
 
-	private String author;
+    private Courier courier;
 
-	public Location(String name, String author) {
-		this.name = name;
-		this.author = author;
-	}
+    // private Date time; ?
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Point getLocation() {
+        return location;
+    }
+
+    public void setLocation(Point location) {
+        this.location = location;
+    }
+
+    public Courier getCourier() {
+        return courier;
+    }
+
+    public void setCourier(Courier courier) {
+        this.courier = courier;
+    }
 }
