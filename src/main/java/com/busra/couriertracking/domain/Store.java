@@ -1,15 +1,20 @@
 package com.busra.couriertracking.domain;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.geo.Point;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Courier {
+public class Store {
 
     @Id
     private String id;
 
     private String name;
+
+    @GeoSpatialIndexed
+    private Point location;
 
     public String getId() {
         return id;
@@ -27,4 +32,11 @@ public class Courier {
         this.name = name;
     }
 
+    public Point getLocation() {
+        return location;
+    }
+
+    public void setLocation(Point location) {
+        this.location = location;
+    }
 }
