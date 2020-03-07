@@ -2,6 +2,7 @@ package com.busra.couriertracking.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.geo.Point;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,13 +15,16 @@ public class CourierLocationLog {
     @Id
     private String id;
 
-    @GeoSpatialIndexed
+    @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     private Point location;
 
     @DBRef
     private Courier courier;
 
     private Date time;
+
+    @DBRef
+    private Store store;
 
     public String getId() {
         return id;
@@ -53,4 +57,13 @@ public class CourierLocationLog {
     public void setTime(Date time) {
         this.time = time;
     }
+
+    public Store getStore() {
+        return store;
+    }
+
+    public void setStore(Store store) {
+        this.store = store;
+    }
+
 }

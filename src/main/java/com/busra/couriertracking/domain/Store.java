@@ -2,6 +2,7 @@ package com.busra.couriertracking.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.geo.Point;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,7 +14,7 @@ public class Store {
 
     private String name;
 
-    @GeoSpatialIndexed
+    @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     private Point location;
 
     public String getId() {
