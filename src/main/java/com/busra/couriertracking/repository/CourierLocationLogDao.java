@@ -2,6 +2,8 @@ package com.busra.couriertracking.repository;
 
 import com.busra.couriertracking.domain.Courier;
 import com.busra.couriertracking.domain.CourierLocationLog;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +27,10 @@ public class CourierLocationLogDao {
 
     public List<CourierLocationLog> findByCourier(Courier courier) {
         return courierLocationLogRepository.findByCourier(courier);
+    }
+
+    public Page<CourierLocationLog> findByCourier(Courier courier, PageRequest pageRequest) {
+        return courierLocationLogRepository.findByCourier(courier, pageRequest);
     }
 
 }

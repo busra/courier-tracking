@@ -62,12 +62,12 @@ public class SampleDataInitializer implements ApplicationListener<ContextRefresh
 
         Courier courier1 = new Courier();
         courier1.setId("CR1");
-        courier1.setName("Raif Efendi");
+        courier1.setName("Aylak Adam");
         courierDao.save(courier1);
 
         Courier courier2 = new Courier();
         courier2.setId("CR2");
-        courier2.setName("Martin Eden");
+        courier2.setName("Vecihi Hürkuş");
         courierDao.save(courier2);
 
         CourierLocationLog courierLocationLog1 = new CourierLocationLog();

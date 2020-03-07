@@ -5,6 +5,8 @@ import com.busra.couriertracking.domain.Courier;
 import com.busra.couriertracking.domain.CourierLocationLog;
 import com.busra.couriertracking.service.CourierLocationLogService;
 import com.busra.couriertracking.service.CourierService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.geo.Distance;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,7 +35,13 @@ public class CourierController {
     }
 
     @GetMapping("/{courierId}/location-log")
-    public List<CourierLocationLog> getLocationLogsOfCourier(@PathVariable String courierId) {
-        return courierLocationLogService.findByCourierId(courierId);
+    public Page<CourierLocationLog> getLocationLogsOfCourier(@PathVariable String courierId, @RequestParam(defaultValue = "0") int pageNumber) {
+        return courierLocationLogService.findByCourierId(courierId, pageNumber);
     }
+
+    @GetMapping("/{courierId}/total-travel-distance")
+    public Distance getTotalTravelDistance(@PathVariable String courierId) {
+        return courierLocationLogService.getTotalTravelDistance(courierId);
+    }
+
 }
