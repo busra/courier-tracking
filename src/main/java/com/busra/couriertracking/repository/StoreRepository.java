@@ -5,10 +5,10 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.List;
+import java.util.Optional;
 
 interface StoreRepository extends MongoRepository<Store, String> {
 
-    List<Store> findByLocationNear(Point location, Distance distance);
+    Optional<Store> findFirstByLocationNear(Point location, Distance distance);
 
 }

@@ -7,7 +7,7 @@ import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Optional;
 
 @Component
 public class StoreDao {
@@ -25,8 +25,8 @@ public class StoreDao {
         storeRepository.save(store);
     }
 
-    public List<Store> findByLocationNear(Point location, double distanceInMeters) {
-        return storeRepository.findByLocationNear(location, new Distance(distanceInMeters / 1_000, Metrics.KILOMETERS));
+    public Optional<Store> findByLocationNear(Point location, double distanceInMeters) {
+        return storeRepository.findFirstByLocationNear(location, new Distance(distanceInMeters / 1_000, Metrics.KILOMETERS));
     }
 
 }

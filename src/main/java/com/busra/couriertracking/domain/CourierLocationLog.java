@@ -26,6 +26,8 @@ public class CourierLocationLog {
     @DBRef
     private Store store;
 
+    private Date entranceTime;
+
     public String getId() {
         return id;
     }
@@ -64,6 +66,14 @@ public class CourierLocationLog {
 
     public void setStore(Store store) {
         this.store = store;
+    }
+
+    public Date getEntranceTime() {
+        return entranceTime;
+    }
+
+    public void setEntranceTime(Date entranceTime) {
+        this.entranceTime = entranceTime;
     }
 
 }

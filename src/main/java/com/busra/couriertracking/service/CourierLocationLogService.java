@@ -7,6 +7,7 @@ import com.busra.couriertracking.domain.Store;
 import com.busra.couriertracking.repository.CourierDao;
 import com.busra.couriertracking.repository.CourierLocationLogDao;
 import com.busra.couriertracking.repository.StoreDao;
+import com.busra.couriertracking.util.DateUtils;
 import com.busra.couriertracking.util.DistanceUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,8 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -44,29 +45,48 @@ public class CourierLocationLogService {
     public void save(String courierId, LocationLogRequest locationLogRequest) {
         Courier courier = getCourierById(courierId);
 
-        // TODO: do last minute check
-
         Point courierCurrentLocation = new Point(locationLogRequest.getLongitude(), locationLogRequest.getLatitude());
 
-        List<Store> nearStores = storeDao.findByLocationNear(courierCurrentLocation, NEAR_STORE_DISTANCE_IN_METERS);
-        if (nearStores.isEmpty()) {
-            CourierLocationLog courierLocationLog = createCourierLocationLog(locationLogRequest, courier, courierCurrentLocation);
-            courierLocationLogDao.save(courierLocationLog);
-        } else {
-            nearStores.forEach(eachNearStore -> {
-                CourierLocationLog courierLocationLog = createCourierLocationLog(locationLogRequest, courier, courierCurrentLocation);
-                courierLocationLog.setStore(eachNearStore);
-                courierLocationLogDao.save(courierLocationLog);
-            });
-        }
-    }
-
-    private CourierLocationLog createCourierLocationLog(LocationLogRequest locationLogRequest, Courier courier, Point courierCurrentLocation) {
         CourierLocationLog courierLocationLog = new CourierLocationLog();
         courierLocationLog.setCourier(courier);
         courierLocationLog.setLocation(courierCurrentLocation);
         courierLocationLog.setTime(locationLogRequest.getTime());
-        return courierLocationLog;
+
+        Optional<Store> nearStoreOptional = storeDao.findByLocationNear(courierCurrentLocation, NEAR_STORE_DISTANCE_IN_METERS);
+        if (nearStoreOptional.isPresent()) {
+            Store currentNearStore = nearStoreOptional.get();
+            courierLocationLog.setStore(currentNearStore);
+            handleEntranceTime(locationLogRequest, courier, courierLocationLog, currentNearStore);
+        }
+
+        courierLocationLogDao.save(courierLocationLog);
+    }
+
+    private void handleEntranceTime(LocationLogRequest locationLogRequest, Courier courier, CourierLocationLog courierLocationLog, Store currentNearStore) {
+        courierLocationLog.setEntranceTime(locationLogRequest.getTime());
+
+        Optional<CourierLocationLog> lastLogRecordOptional = courierLocationLogDao.findByCourier(courier, PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "time"))).getContent().stream().findFirst();
+        if (lastLogRecordOptional.isPresent()) {
+            CourierLocationLog lastLogRecord = lastLogRecordOptional.get();
+
+            if (isNewEntrance(currentNearStore, lastLogRecord)) {
+                courierLocationLog.setEntranceTime(locationLogRequest.getTime());
+            } else if (isReEntranceWithinOneMinute(locationLogRequest, currentNearStore, lastLogRecord)) {
+                courierLocationLog.setEntranceTime(lastLogRecord.getEntranceTime());
+            } else {
+                courierLocationLog.setEntranceTime(null);
+            }
+        }
+    }
+
+    private boolean isNewEntrance(Store currentNearStore, CourierLocationLog lastLogRecord) {
+        return Objects.isNull(lastLogRecord.getStore()) || !lastLogRecord.getStore().getId().equals(currentNearStore.getId());
+    }
+
+    private boolean isReEntranceWithinOneMinute(LocationLogRequest locationLogRequest, Store currentNearStore, CourierLocationLog lastLogRecord) {
+        return lastLogRecord.getStore().getId().equals(currentNearStore.getId())
+                && Objects.nonNull(lastLogRecord.getEntranceTime())
+                && DateUtils.timeDifferenceInSeconds(lastLogRecord.getEntranceTime(), locationLogRequest.getTime()) <= 60;
     }
 
     public Page<CourierLocationLog> findByCourierId(String courierId, int pageNumber) {
@@ -100,6 +120,7 @@ public class CourierLocationLogService {
     }
 
     private Courier getCourierById(String courierId) {
-        return courierDao.findById(courierId).get(); // TODO: handle empty case
+        return courierDao.findById(courierId).orElseThrow(() -> new RuntimeException("Courier not found"));
     }
+
 }
